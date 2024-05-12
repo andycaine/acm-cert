@@ -1,0 +1,39 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: Just an ACM certificate.
+
+Metadata:
+  AWS::ServerlessRepo::Application:
+    Name: acm-cert
+    Description: Just an ACM certificate.
+    Author: Andy Caine
+    SemanticVersion: 0.1.0
+    SpdxLicenseId: MIT
+    LicenseUrl: LICENSE
+    ReadmeUrl: README.md
+    Labels: ['acm']
+    HomePageUrl: https://github.com/andycaine/acm-cert#readme
+    SourceCodeUrl: https://github.com/andycaine/acm-cert
+
+Parameters:
+  DomainName:
+    Type: String
+    Description: The domain name
+  HostedZoneId:
+    Type: String
+    Description: HostedZoneId for the Domain
+
+Resources:
+  Certificate:
+    Type: "AWS::CertificateManager::Certificate"
+    Properties:
+      CertificateTransparencyLoggingPreference: ENABLED
+      DomainName: !Ref DomainName
+      DomainValidationOptions:
+        - DomainName: !Ref DomainName
+          HostedZoneId: !Ref HostedZoneId
+      ValidationMethod: DNS
+
+Outputs:
+  CertificateArn:
+    Value: !Ref Certificate
