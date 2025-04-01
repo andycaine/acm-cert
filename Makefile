@@ -1,20 +1,13 @@
 SHELL := /bin/bash
+STACK_NAME := acm-cert
+ASSETS_BUCKET := cfn-assets-repository-publicassetsbucket-lyi1yv8zzwxh
+VERSION := 1.0.0
 
-clean:
-	rm -f packaged.yaml
-	rm -rf .aws-sam/build
+publish: template.yaml
+	aws s3 cp $< s3://$(ASSETS_BUCKET)/$(STACK_NAME)-$(VERSION).yaml
 
-.aws-sam/build: template.yaml
-	sam build
+tag:
+	git tag -a v$(VERSION) -m "Release $(VERSION)"
 
-deploy: .aws-sam/build
-	sam deploy
-
-packaged.yaml: .aws-sam/build
-	sam package \
-		--resolve-s3 \
-		--output-template-file $@
-
-publish: packaged.yaml
-	sam publish --template packaged.yaml
-
+release: tag
+	git push origin v$(VERSION)
